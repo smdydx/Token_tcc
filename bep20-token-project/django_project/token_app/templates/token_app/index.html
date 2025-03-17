@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Wallet Pro</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --primary: #F6851B;
+            --background: #121212;
+            --surface: #1E1E1E;
+            --secondary-text: #888;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: var(--surface);
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-link {
+            color: var(--secondary-text);
+            padding: 12px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+
+        .sidebar-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 240px;
+            padding: 32px;
+            transition: margin 0.3s;
+        }
+
+        /* Wallet Header */
+        .wallet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .network-indicator {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* Toggle Button */
+        #sidebar-toggle {
+            background: none;
+            border: none;
+            color: white;
+            padding: 8px;
+            display: none;
+        }
+
+        /* Balance Card */
+        .balance-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .balance-change {
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .action-card {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.2s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .action-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 12px;
+        }
+
+        /* Transactions */
+        .transactions-section {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .transaction-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        /* Token Info */
+        .token-info-section {
+            margin-top: 32px;
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .token-info-text {
+            color: var(--secondary-text);
+            line-height: 1.6;
+            max-width: 800px;
+        }
+
+        /* Connect Button */
+        .connect-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: opacity 0.2s ease;
+        }
+
+        .connect-btn:hover {
+            opacity: 0.9;
+        }
+
+        .wallet-address {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .wallet-address span {
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+
+        .wallet-address i {
+            cursor: pointer;
+            color: #ff9800;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 24px;
+            }
+
+            #sidebar-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="d-flex flex-column h-100">
+            <div class="mb-8">
+                <h3 class="text-white mb-5">EraWallet</h3>
+                <nav class="sidebar-nav">
+                    <a href="#" class="sidebar-link active">
+                        <i class="fas fa-wallet"></i>
+                        Wallet
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-exchange-alt"></i>
+                        Swap
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-chart-line"></i>
+                        Markets
+                    </a>
+                    <a href="#" class="sidebar-link">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <!-- Wallet Header -->
+        <header class="wallet-header">
+            <div class="wallet-info">
+                <button id="sidebar-toggle" class="d-lg-none mr-3">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="text-white">Digital Wallet</h1>
+                <div class="network-indicator">Ethereum Mainnet</div>
+            </div>
+            <div>
+                <button class="connect-btn" id="connect-btn" onclick="connectWallet()">
+                    <i class="fas fa-plug"></i>
+                    Connect Wallet
+                </button>
+                <div class="wallet-address" id="wallet-address" style="display: none;">
+                    <span id="wallet-address-text"></span>
+                    <i class="fas fa-sign-out-alt" title="Disconnect" onclick="disconnectWallet()"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Balance Card -->
+        <section class="balance-card">
+            <div class="text-secondary">Total Balance</div>
+            <div class="balance-amount" id="balance-amount">$0.00</div>
+            <div class="balance-change">
+                <i class="fas fa-arrow-up"></i>
+                +$0.00 (0.00%)
+            </div>
+        </section>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-card" onclick="buyCrypto()">
+                <div class="action-icon"><i class="fas fa-cart-plus"></i></div>
+                <div>Buy</div>
+            </div>
+            <div class="action-card" onclick="sellCrypto()">
+                <div class="action-icon"><i class="fas fa-coins"></i></div>
+                <div>Sell</div>
+            </div>
+            <div class="action-card" onclick="swapTokens()">
+                <div class="action-icon"><i class="fas fa-exchange-alt"></i></div>
+                <div>Swap</div>
+            </div>
+            <a href="{% url 'transfer' %}" class="action-card">
+                <div class="action-icon"><i class="fas fa-paper-plane"></i></div>
+                <div>Send</div>
+            </a>
+        </div>
+
+        <!-- Transactions -->
+        <section class="transactions-section">
+            <h4 class="text-white mb-4">Recent Transactions</h4>
+            <div class="transaction-item">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="transaction-status"></div>
+                    <div>
+                        <div>Sent 0.1 ETH</div>
+                        <div class="text-secondary">To: 0x123...789</div>
+                    </div>
+                </div>
+                <div class="text-secondary">Pending</div>
+            </div>
+            <div class="transaction-item">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="transaction-status"></div>
+                    <div>
+                        <div>Received 1.5 ETH</div>
+                        <div class="text-secondary">From: 0xabc...456</div>
+                    </div>
+                </div>
+                <div class="text-success">Completed</div>
+            </div>
+        </section>
+
+        <!-- Token Information -->
+        <section class="token-info-section">
+            <h4 class="text-white mb-4">About Crypto Tokens</h4>
+            <p class="token-info-text">
+                Cryptographic tokens are digital assets built on blockchain technology, 
+                representing ownership or access rights. They enable decentralized 
+                applications through smart contracts, allowing for programmable money 
+                and decentralized finance (DeFi) solutions. Tokens can represent various 
+                assets including currencies, securities, or utility access.
+                
+                Modern tokens adhere to standards like ERC-20 (fungible tokens) and 
+                ERC-721 (non-fungible tokens), ensuring interoperability across platforms. 
+                Always verify contract addresses and audit reports before transactions.
+            </p>
+        </section>
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+
+    <script>
+        let web3;
+
+        // Sidebar Toggle
+        document.getElementById('sidebar-toggle').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Wallet Functions
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    web3 = new Web3(window.ethereum);
+                    const accounts = await web3.eth.getAccounts();
+                    const account = accounts[0];
+                    updateWalletUI(account);
+                    getBalance(account);
+                } catch (error) {
+                    console.error("User denied account access");
+                }
+            } else {
+                alert("Please install MetaMask!");
+            }
+        }
+
+        function updateWalletUI(address) {
+            document.getElementById('connect-btn').style.display = 'none';
+            document.getElementById('wallet-address').style.display = 'flex';
+            document.getElementById('wallet-address-text').textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+        }
+
+        async function getBalance(account) {
+            const balance = await web3.eth.getBalance(account);
+            const ethBalance = web3.utils.fromWei(balance, 'ether');
+            document.getElementById('balance-amount').textContent = `${ethBalance} ETH`;
+        }
+
+        function disconnectWallet() {
+            document.getElementById('wallet-address').style.display = 'none';
+            document.getElementById('connect-btn').style.display = 'block';
+            document.getElementById('balance-amount').textContent = '$0.00';
+        }
+
+        // Placeholder functions for actions
+        function buyCrypto() { alert("Buy interface coming soon"); }
+        function sellCrypto() { alert("Sell interface coming soon"); }
+        function swapTokens() { alert("Swap interface coming soon"); }
+    </script>
+</body>
+</html>
