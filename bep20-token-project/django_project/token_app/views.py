@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 BSC_RPC_URL = os.getenv("BSC_RPC_URL")
-CONTRACT_ADDRESS = "0xf35270C748f97231F7B654F424704eABFF3DF53F"
+CONTRACT_ADDRESS = "0x22aa7085bA684fdbbAA39a86DCEfF918d50380D0"
 
 # Connect to Binance Smart Chain
 w3 = Web3(Web3.HTTPProvider(BSC_RPC_URL))
