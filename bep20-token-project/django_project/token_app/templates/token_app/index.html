@@ -418,7 +418,12 @@
                     alert("Failed to connect wallet. Please try again.");
                 }
             } else {
-                alert("MetaMask is not installed. Please install MetaMask and try again.");
+                // Check if the user is on a mobile device
+                if (isMobileDevice()) {
+                    alert("MetaMask is not detected. Please open this website in the MetaMask mobile browser.");
+                } else {
+                    alert("MetaMask is not installed. Please install MetaMask and try again.");
+                }
             }
         }
     
@@ -443,6 +448,11 @@
             document.getElementById('wallet-address').style.display = 'none';
             document.getElementById('connect-btn').style.display = 'block';
             document.getElementById('balance-amount').textContent = '$0.00';
+        }
+    
+        // Helper function to detect mobile devices
+        function isMobileDevice() {
+            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         }
     
         // Placeholder functions for actions
