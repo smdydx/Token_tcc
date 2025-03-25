@@ -397,15 +397,17 @@
                     alert("Failed to connect wallet. Please try again.");
                 }
             } else if (isMobileDevice()) {
-                // Mobile browser without MetaMask
+                // Mobile browser using WalletConnect
                 try {
                     provider = new WalletConnectProvider.default({
                         rpc: {
                             56: "https://bsc-dataseed.binance.org/" // Binance Smart Chain RPC URL
-                        }
+                        },
+                        chainId: 56, // Binance Smart Chain ID
+                        qrcode: true, // Display QR code for connection
                     });
     
-                    // Enable session (triggers QR Code modal)
+                    // Enable session (triggers QR Code modal or opens MetaMask app)
                     await provider.enable();
     
                     web3 = new Web3(provider);
@@ -415,6 +417,11 @@
     
                     updateWalletUI(account);
                     getBalance(account);
+    
+                    // Listen for session disconnect
+                    provider.on("disconnect", () => {
+                        disconnectWallet();
+                    });
                 } catch (error) {
                     console.error("WalletConnect error:", error);
                     alert("Failed to connect wallet. Please try again.");
