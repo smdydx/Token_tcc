@@ -376,90 +376,90 @@
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
 
-    <script>
-        let web3;
-        let provider;
     
-        async function connectWallet() {
-            if (typeof window.ethereum !== 'undefined') {
-                // Desktop browser with MetaMask
-                try {
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    web3 = new Web3(window.ethereum);
-    
-                    const accounts = await web3.eth.getAccounts();
-                    const account = accounts[0];
-    
-                    updateWalletUI(account);
-                    getBalance(account);
-                } catch (error) {
-                    console.error("User denied account access or an error occurred:", error);
-                    alert("Failed to connect wallet. Please try again.");
-                }
-            } else if (isMobileDevice()) {
-                // Mobile browser using WalletConnect
-                try {
-                    provider = new WalletConnectProvider.default({
-                        rpc: {
-                            56: "https://bsc-dataseed.binance.org/" // Binance Smart Chain RPC URL
-                        },
-                        chainId: 56, // Binance Smart Chain ID
-                        qrcode: true, // Display QR code for connection
-                    });
-    
-                    // Enable session (triggers QR Code modal or opens MetaMask app)
-                    await provider.enable();
-    
-                    web3 = new Web3(provider);
-    
-                    const accounts = await web3.eth.getAccounts();
-                    const account = accounts[0];
-    
-                    updateWalletUI(account);
-                    getBalance(account);
-    
-                    // Listen for session disconnect
-                    provider.on("disconnect", () => {
-                        disconnectWallet();
-                    });
-                } catch (error) {
-                    console.error("WalletConnect error:", error);
-                    alert("Failed to connect wallet. Please try again.");
-                }
-            } else {
-                alert("MetaMask is not installed. Please install MetaMask and try again.");
-            }
-        }
-    
-        function updateWalletUI(address) {
-            document.getElementById('connect-btn').style.display = 'none';
-            document.getElementById('wallet-address').style.display = 'flex';
-            document.getElementById('wallet-address-text').textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
-        }
-    
-        async function getBalance(account) {
-            try {
-                const balance = await web3.eth.getBalance(account);
-                const ethBalance = web3.utils.fromWei(balance, 'ether');
-                document.getElementById('balance-amount').textContent = `${ethBalance} ETH`;
-            } catch (error) {
-                console.error("Failed to fetch balance:", error);
-                alert("Failed to fetch balance. Please try again.");
-            }
-        }
-    
-        function disconnectWallet() {
-            if (provider) {
-                provider.disconnect();
-            }
-            document.getElementById('wallet-address').style.display = 'none';
-            document.getElementById('connect-btn').style.display = 'block';
-            document.getElementById('balance-amount').textContent = '$0.00';
-        }
-    
-        function isMobileDevice() {
-            return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-        }
-    </script>
 </body>
-</html>
+</html><script>
+    let web3;
+    let provider;
+
+    async function connectWallet() {
+        if (typeof window.ethereum !== 'undefined') {
+            // Desktop browser with MetaMask
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                web3 = new Web3(window.ethereum);
+
+                const accounts = await web3.eth.getAccounts();
+                const account = accounts[0];
+
+                updateWalletUI(account);
+                getBalance(account);
+            } catch (error) {
+                console.error("User denied account access or an error occurred:", error);
+                alert("Failed to connect wallet. Please try again.");
+            }
+        } else if (isMobileDevice()) {
+            // Mobile browser using WalletConnect
+            try {
+                provider = new WalletConnectProvider.default({
+                    rpc: {
+                        56: "https://bsc-dataseed.binance.org/" // Binance Smart Chain RPC URL
+                    },
+                    chainId: 56, // Binance Smart Chain ID
+                    qrcode: true, // Display QR code for connection
+                });
+
+                // Enable session (triggers QR Code modal or opens MetaMask app)
+                await provider.enable();
+
+                web3 = new Web3(provider);
+
+                const accounts = await web3.eth.getAccounts();
+                const account = accounts[0];
+
+                updateWalletUI(account);
+                getBalance(account);
+
+                // Listen for session disconnect
+                provider.on("disconnect", () => {
+                    disconnectWallet();
+                });
+            } catch (error) {
+                console.error("WalletConnect error:", error);
+                alert("Failed to connect wallet. Please try again.");
+            }
+        } else {
+            alert("MetaMask is not installed. Please install MetaMask and try again.");
+        }
+    }
+
+    function updateWalletUI(address) {
+        document.getElementById('connect-btn').style.display = 'none';
+        document.getElementById('wallet-address').style.display = 'flex';
+        document.getElementById('wallet-address-text').textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
+    }
+
+    async function getBalance(account) {
+        try {
+            const balance = await web3.eth.getBalance(account);
+            const ethBalance = web3.utils.fromWei(balance, 'ether');
+            document.getElementById('balance-amount').textContent = `${ethBalance} ETH`;
+        } catch (error) {
+            console.error("Failed to fetch balance:", error);
+            alert("Failed to fetch balance. Please try again.");
+        }
+    }
+
+    function disconnectWallet() {
+        if (provider) {
+            provider.disconnect();
+        }
+        document.getElementById('wallet-address').style.display = 'none';
+        document.getElementById('connect-btn').style.display = 'block';
+        document.getElementById('balance-amount').textContent = '$0.00';
+    }
+
+    function isMobileDevice() {
+        return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+</script>
