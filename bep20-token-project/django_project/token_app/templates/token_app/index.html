@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryptoSphere Pro</title>
+    <title>CryptoSphere Pro - Secure Web3 Wallet</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <!-- Animate CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -21,6 +23,8 @@
             --secondary-text: #94A3B8;
             --success: #10B981;
             --warning: #F59E0B;
+            --danger: #EF4444;
+            --overlay: rgba(15, 23, 42, 0.8);
         }
 
         * {
@@ -67,10 +71,14 @@
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
             box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+            overflow-y: auto;
         }
 
         .sidebar-header {
             margin-bottom: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
         }
 
         .sidebar-nav {
@@ -133,6 +141,8 @@
             align-items: center;
             margin-bottom: 2.5rem;
             animation: slideDown 0.5s ease;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .network-indicator {
@@ -143,6 +153,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .network-dot {
@@ -150,6 +161,59 @@
             height: 8px;
             border-radius: 50%;
             background: var(--success);
+        }
+
+        /* Wallet Connect Button */
+        .connect-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .connect-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .connect-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Wallet Address Display */
+        .wallet-address {
+            background: rgba(255,255,255,0.1);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-address:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .wallet-address i {
+            color: var(--secondary-text);
+            transition: color 0.3s ease;
+        }
+
+        .wallet-address:hover i {
+            color: var(--danger);
         }
 
         /* Balance Card */
@@ -162,6 +226,7 @@
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             animation: cardEnter 0.6s ease;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .balance-card::after {
@@ -173,6 +238,21 @@
             height: 200%;
             background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.1), transparent);
             animation: glow 4s linear infinite;
+        }
+
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .balance-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
         }
 
         @keyframes glow {
@@ -217,12 +297,19 @@
             pointer-events: none;
         }
 
+        .action-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+
         /* Transactions */
         .transactions-section {
             background: var(--surface);
             border-radius: 20px;
             padding: 2rem;
             animation: fadeIn 0.8s ease;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         .transaction-item {
@@ -234,8 +321,67 @@
             transition: transform 0.3s ease;
         }
 
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
         .transaction-item:hover {
             transform: translateX(10px);
+        }
+
+        .transaction-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .transaction-status.completed {
+            background: var(--success);
+        }
+
+        .transaction-status.pending {
+            background: var(--warning);
+        }
+
+        .transaction-status.failed {
+            background: var(--danger);
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Overlay for mobile sidebar */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
         }
 
         /* Loader */
@@ -269,6 +415,16 @@
         }
 
         /* Responsive Design */
+        @media (max-width: 992px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+            
+            .balance-card {
+                padding: 1.5rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -282,11 +438,31 @@
 
             .main-content {
                 margin-left: 0;
-                padding: 1.5rem;
             }
 
-            .balance-card {
-                padding: 1.5rem;
+            .menu-toggle {
+                display: block;
+            }
+
+            .wallet-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .wallet-controls {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .balance-amount {
+                font-size: 2rem;
             }
         }
     </style>
@@ -294,11 +470,19 @@
 <body>
     <div class="gradient-bg"></div>
     
-    <nav class="sidebar">
+    <!-- Mobile Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    
+    <nav class="sidebar" id="sidebar">
         <div class="d-flex flex-column h-100">
             <div class="sidebar-header">
-                <h2 class="text-white mb-0">CryptoSphere</h2>
-                <small class="text-secondary">Secure Web3 Wallet</small>
+                <div class="wallet-logo">
+                    <i class="fas fa-wallet text-primary"></i>
+                </div>
+                <div>
+                    <h2 class="text-white mb-0">CryptoSphere</h2>
+                    <small class="text-secondary">Secure Web3 Wallet</small>
+                </div>
             </div>
             <nav class="sidebar-nav mt-4">
                 <a href="#" class="sidebar-link active">
@@ -317,25 +501,36 @@
                     <i class="fas fa-cog"></i>
                     Settings
                 </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-shield-alt"></i>
+                    Security
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-question-circle"></i>
+                    Help & Support
+                </a>
             </nav>
+            <div class="mt-auto pt-3">
+                <div class="text-secondary small text-center">v1.0.0</div>
+            </div>
         </div>
     </nav>
 
     <main class="main-content">
         <header class="wallet-header">
-            <div class="wallet-info">
-                <button id="sidebar-toggle" class="d-lg-none mr-3">
+            <div class="wallet-info d-flex align-items-center">
+                <button class="menu-toggle mr-3" id="sidebar-toggle">
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="network-indicator">
                     <span class="network-dot"></span>
-                    <span>Ethereum Mainnet</span>
+                    <span id="network-name">Ethereum Mainnet</span>
                 </div>
             </div>
             <div class="wallet-controls">
                 <button class="connect-btn" id="connect-btn" onclick="connectWallet()">
                     <i class="fas fa-plug"></i>
-                    Connect Wallet
+                    <span id="connect-btn-text">Connect Wallet</span>
                 </button>
                 <div class="wallet-address" id="wallet-address" style="display: none;">
                     <span id="wallet-address-text"></span>
@@ -352,10 +547,11 @@
                         <div class="loader" id="balance-loader" style="display: none;"></div>
                         <span id="balance-text">0 ETH</span>
                     </div>
+                    <div class="mt-2 text-secondary small">≈ $<span id="usd-balance">0.00</span></div>
                 </div>
                 <div class="balance-change text-success">
                     <i class="fas fa-arrow-trend-up"></i>
-                    +5.2% (24h)
+                    <span id="balance-change">+5.2% (24h)</span>
                 </div>
             </div>
         </section>
@@ -380,9 +576,17 @@
         </div>
 
         <section class="transactions-section">
-            <h4 class="text-white mb-4">Transaction History</h4>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="text-white mb-0">Recent Transactions</h4>
+                <button class="btn btn-sm btn-outline-primary" onclick="refreshTransactions()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
             <div id="transactions-list">
-                <!-- Dynamic transactions will be loaded here -->
+                <div class="text-center py-4">
+                    <div class="loader mx-auto" id="transactions-loader"></div>
+                    <div class="mt-2 text-secondary">Loading transactions...</div>
+                </div>
             </div>
         </section>
     </main>
@@ -391,22 +595,46 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
     <script>
+        // Initialize toastr
+        toastr.options = {
+            positionClass: 'toast-bottom-right',
+            progressBar: true,
+            timeOut: 5000,
+            closeButton: true
+        };
+
         let web3;
         let provider;
         let currentAccount = null;
+        let ethPrice = 0;
 
         // Initialize
         $(document).ready(() => {
             // Sidebar toggle
-            $('#sidebar-toggle').click(() => {
-                $('.sidebar').toggleClass('active');
-            });
+            $('#sidebar-toggle').click(toggleSidebar);
+            $('#sidebar-overlay').click(toggleSidebar);
 
             // Check if wallet is already connected
             checkConnectedWallet();
+            
+            // Fetch ETH price
+            fetchEthPrice();
+            
+            // Load empty state for transactions
+            setTimeout(() => {
+                if (!$('#wallet-address').is(':visible')) {
+                    showEmptyTransactions();
+                }
+            }, 1500);
         });
+
+        function toggleSidebar() {
+            $('.sidebar').toggleClass('active');
+            $('#sidebar-overlay').toggleClass('active');
+        }
 
         async function checkConnectedWallet() {
             if (window.ethereum && window.ethereum.selectedAddress) {
@@ -419,6 +647,7 @@
         async function connectWallet() {
             try {
                 $('#connect-btn').prop('disabled', true);
+                $('#connect-btn-text').text('Connecting...');
                 
                 if (window.ethereum) {
                     // Desktop/Mobile with MetaMask
@@ -427,10 +656,14 @@
                     // Mobile with WalletConnect
                     await handleWalletConnect();
                 } else {
-                    throw new Error('No Ethereum provider detected');
+                    throw new Error('No Ethereum provider detected. Please install MetaMask or use a Web3 compatible browser.');
                 }
+                
+                toastr.success('Wallet connected successfully');
             } catch (error) {
-                showError(`Connection Error: ${error.message}`);
+                console.error('Connection Error:', error);
+                toastr.error(error.message);
+                $('#connect-btn-text').text('Connect Wallet');
             } finally {
                 $('#connect-btn').prop('disabled', false);
             }
@@ -441,13 +674,22 @@
                 const accounts = await window.ethereum.request({ 
                     method: 'eth_requestAccounts' 
                 });
+                
+                if (accounts.length === 0) {
+                    throw new Error('No accounts found');
+                }
+                
                 currentAccount = accounts[0];
                 web3 = new Web3(window.ethereum);
                 initEventListeners();
                 loadWalletData(currentAccount);
                 updateWalletUI(currentAccount);
+                
+                // Check chain ID
+                const chainId = await web3.eth.getChainId();
+                updateNetwork(chainId);
             } catch (error) {
-                throw new Error('User rejected request');
+                throw new Error('User rejected request or connection failed');
             }
         }
 
@@ -472,10 +714,19 @@
                 await provider.enable();
                 web3 = new Web3(provider);
                 const accounts = await web3.eth.getAccounts();
+                
+                if (accounts.length === 0) {
+                    throw new Error('No accounts found');
+                }
+                
                 currentAccount = accounts[0];
                 initEventListeners();
                 loadWalletData(currentAccount);
                 updateWalletUI(currentAccount);
+                
+                // Check chain ID
+                const chainId = await web3.eth.getChainId();
+                updateNetwork(chainId);
             } catch (error) {
                 throw new Error('WalletConnect connection failed');
             }
@@ -486,6 +737,24 @@
                 window.ethereum.on('accountsChanged', (accounts) => {
                     if (accounts.length === 0) {
                         disconnectWallet();
+                        toastr.info('Wallet disconnected');
+                    } else {
+                        currentAccount = accounts[0];
+                        updateWalletUI(currentAccount);
+                        loadWalletData(currentAccount);
+                        toastr.info('Account changed');
+                    }
+                });
+
+                window.ethereum.on('chainChanged', (chainId) => {
+                    window.location.reload();
+                });
+            }
+            
+            if (provider) {
+                provider.on("accountsChanged", (accounts) => {
+                    if (accounts.length === 0) {
+                        disconnectWallet();
                     } else {
                         currentAccount = accounts[0];
                         updateWalletUI(currentAccount);
@@ -493,8 +762,13 @@
                     }
                 });
 
-                window.ethereum.on('chainChanged', (chainId) => {
+                provider.on("chainChanged", (chainId) => {
                     updateNetwork(parseInt(chainId));
+                });
+
+                provider.on("disconnect", (code, reason) => {
+                    disconnectWallet();
+                    toastr.info('Wallet disconnected');
                 });
             }
         }
@@ -506,54 +780,133 @@
                 
                 const balance = await web3.eth.getBalance(address);
                 const ethBalance = web3.utils.fromWei(balance, 'ether');
+                const formattedBalance = parseFloat(ethBalance).toFixed(4);
                 
-                $('#balance-text').text(`${parseFloat(ethBalance).toFixed(4)} ETH`);
+                $('#balance-text').text(`${formattedBalance} ETH`);
+                
+                // Update USD balance if price is available
+                if (ethPrice > 0) {
+                    const usdValue = (formattedBalance * ethPrice).toFixed(2);
+                    $('#usd-balance').text(usdValue);
+                }
+                
                 loadTransactionHistory(address);
             } catch (error) {
-                showError('Failed to load wallet data');
+                console.error('Failed to load wallet data:', error);
+                toastr.error('Failed to load wallet data');
             } finally {
                 $('#balance-loader').hide();
                 $('#balance-text').show();
             }
         }
 
-        async function loadTransactionHistory(address) {
-            // Implement actual transaction fetching here
-            const mockTransactions = [
-                {
-                    type: 'sent',
-                    amount: '0.1 ETH',
-                    to: '0x123...789',
-                    status: 'pending',
-                    timestamp: new Date().toISOString()
-                },
-                {
-                    type: 'received',
-                    amount: '1.5 ETH',
-                    from: '0xabc...456',
-                    status: 'completed',
-                    timestamp: new Date().toISOString()
+        async function fetchEthPrice() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+                const data = await response.json();
+                ethPrice = data.ethereum.usd;
+                
+                // Update USD balance if wallet is connected
+                if (currentAccount) {
+                    const ethBalance = parseFloat($('#balance-text').text().split(' ')[0]);
+                    const usdValue = (ethBalance * ethPrice).toFixed(2);
+                    $('#usd-balance').text(usdValue);
                 }
-            ];
+            } catch (error) {
+                console.error('Failed to fetch ETH price:', error);
+            }
+        }
 
-            $('#transactions-list').html(
-                mockTransactions.map(tx => `
-                    <div class="transaction-item">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="transaction-status ${tx.status}"></div>
-                            <div>
-                                <div>${tx.type === 'sent' ? 'Sent' : 'Received'} ${tx.amount}</div>
-                                <small class="text-secondary">
-                                    ${tx.type === 'sent' ? 'To' : 'From'}: ${tx.to || tx.from}
-                                </small>
+        async function loadTransactionHistory(address) {
+            try {
+                $('#transactions-loader').show();
+                
+                // Simulate API delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                const mockTransactions = [
+                    {
+                        type: 'sent',
+                        amount: '0.1 ETH',
+                        to: '0x123...789',
+                        status: 'completed',
+                        timestamp: new Date(Date.now() - 3600000).toISOString(),
+                        value: '0.1'
+                    },
+                    {
+                        type: 'received',
+                        amount: '1.5 ETH',
+                        from: '0xabc...456',
+                        status: 'completed',
+                        timestamp: new Date(Date.now() - 86400000).toISOString(),
+                        value: '1.5'
+                    },
+                    {
+                        type: 'swap',
+                        amount: '0.5 ETH',
+                        to: 'Uniswap',
+                        status: 'completed',
+                        timestamp: new Date(Date.now() - 172800000).toISOString(),
+                        value: '0.5'
+                    },
+                    {
+                        type: 'sent',
+                        amount: '0.02 ETH',
+                        to: '0x456...def',
+                        status: 'pending',
+                        timestamp: new Date().toISOString(),
+                        value: '0.02'
+                    }
+                ];
+
+                $('#transactions-list').html(
+                    mockTransactions.map(tx => `
+                        <div class="transaction-item">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="transaction-status ${tx.status}"></div>
+                                <div>
+                                    <div class="font-weight-500">${tx.type === 'sent' ? 'Sent' : tx.type === 'received' ? 'Received' : 'Swapped'} ${tx.amount}</div>
+                                    <small class="text-secondary">
+                                        ${tx.type === 'sent' ? 'To' : tx.type === 'received' ? 'From' : 'Via'}: ${tx.to || tx.from}
+                                    </small>
+                                    <div class="text-secondary small mt-1">${formatDate(tx.timestamp)}</div>
+                                </div>
+                            </div>
+                            <div class="text-${tx.status === 'completed' ? 'success' : tx.status === 'pending' ? 'warning' : 'danger'}">
+                                ${tx.status}
                             </div>
                         </div>
-                        <div class="text-${tx.status === 'completed' ? 'success' : 'warning'}">
-                            ${tx.status}
-                        </div>
+                    `).join('')
+                );
+            } catch (error) {
+                console.error('Failed to load transactions:', error);
+                $('#transactions-list').html(`
+                    <div class="text-center py-4 text-danger">
+                        <i class="fas fa-exclamation-circle fa-2x mb-2"></i>
+                        <div>Failed to load transactions</div>
+                        <button class="btn btn-sm btn-outline-primary mt-3" onclick="loadTransactionHistory('${address}')">
+                            <i class="fas fa-sync-alt"></i> Try Again
+                        </button>
                     </div>
-                `).join('')
-            );
+                `);
+            } finally {
+                $('#transactions-loader').hide();
+            }
+        }
+
+        function showEmptyTransactions() {
+            $('#transactions-list').html(`
+                <div class="text-center py-4">
+                    <i class="fas fa-wallet fa-2x mb-3 text-secondary"></i>
+                    <div class="text-secondary">No transactions found</div>
+                    <div class="text-secondary small mt-1">Connect your wallet to view transactions</div>
+                </div>
+            `);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
         }
 
         function updateWalletUI(address) {
@@ -562,6 +915,7 @@
             $('#wallet-address-text').text(
                 `${address.slice(0, 6)}...${address.slice(-4)}`
             );
+            $('#connect-btn-text').text('Connect Wallet');
         }
 
         function disconnectWallet() {
@@ -574,21 +928,62 @@
             $('#wallet-address').hide();
             $('#connect-btn').show();
             $('#balance-text').text('0 ETH');
-            $('#transactions-list').empty();
+            $('#usd-balance').text('0.00');
+            showEmptyTransactions();
+        }
+
+        function updateNetwork(chainId) {
+            let networkName = 'Unknown Network';
+            let networkDotColor = 'var(--warning)';
+            
+            switch(chainId) {
+                case 1:
+                    networkName = 'Ethereum Mainnet';
+                    networkDotColor = 'var(--success)';
+                    break;
+                case 5:
+                    networkName = 'Goerli Testnet';
+                    networkDotColor = 'var(--warning)';
+                    break;
+                case 137:
+                    networkName = 'Polygon Mainnet';
+                    networkDotColor = 'var(--primary)';
+                    break;
+                case 80001:
+                    networkName = 'Mumbai Testnet';
+                    networkDotColor = 'var(--warning)';
+                    break;
+                default:
+                    networkName = `Unknown Network (${chainId})`;
+                    networkDotColor = 'var(--danger)';
+            }
+            
+            $('#network-name').text(networkName);
+            $('.network-dot').css('background', networkDotColor);
         }
 
         function handleAction(type) {
-            // Implement action handlers
+            if (!currentAccount) {
+                toastr.warning('Please connect your wallet first');
+                return;
+            }
+            
+            toastr.info(`Initiating ${type} action...`);
             console.log(`Handling ${type} action`);
+        }
+
+        function refreshTransactions() {
+            if (!currentAccount) {
+                toastr.warning('Please connect your wallet first');
+                return;
+            }
+            
+            toastr.info('Refreshing transactions...');
+            loadTransactionHistory(currentAccount);
         }
 
         function isMobileDevice() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        function showError(message) {
-            // Implement error toast
-            console.error(message);
         }
     </script>
 </body>
