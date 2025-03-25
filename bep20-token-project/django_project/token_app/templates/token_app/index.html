@@ -377,61 +377,74 @@
 
     <script>
         let web3;
-
+    
         // Sidebar Toggle
-        document.getElementById('sidebar-toggle').addEventListener('click', function() {
+        document.getElementById('sidebar-toggle').addEventListener('click', function () {
             const sidebar = document.querySelector('.sidebar');
             sidebar.classList.toggle('active');
         });
-
+    
         // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const sidebar = document.querySelector('.sidebar');
             const sidebarToggle = document.getElementById('sidebar-toggle');
-            
-            if (window.innerWidth <= 768 && 
-                !sidebar.contains(event.target) && 
+    
+            if (window.innerWidth <= 768 &&
+                !sidebar.contains(event.target) &&
                 !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
         });
-
+    
         // Wallet Functions
         async function connectWallet() {
-            if (window.ethereum) {
+            if (typeof window.ethereum !== 'undefined') {
                 try {
+                    // Request account access
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
                     web3 = new Web3(window.ethereum);
+    
+                    // Get the connected account
                     const accounts = await web3.eth.getAccounts();
                     const account = accounts[0];
+    
+                    // Update the UI with the connected account
                     updateWalletUI(account);
+    
+                    // Fetch and display the balance
                     getBalance(account);
                 } catch (error) {
-                    console.error("User denied account access");
+                    console.error("User denied account access or an error occurred:", error);
+                    alert("Failed to connect wallet. Please try again.");
                 }
             } else {
-                alert("Please install MetaMask!");
+                alert("MetaMask is not installed. Please install MetaMask and try again.");
             }
         }
-
+    
         function updateWalletUI(address) {
             document.getElementById('connect-btn').style.display = 'none';
             document.getElementById('wallet-address').style.display = 'flex';
             document.getElementById('wallet-address-text').textContent = `${address.slice(0, 6)}...${address.slice(-4)}`;
         }
-
+    
         async function getBalance(account) {
-            const balance = await web3.eth.getBalance(account);
-            const ethBalance = web3.utils.fromWei(balance, 'ether');
-            document.getElementById('balance-amount').textContent = `${ethBalance} ETH`;
+            try {
+                const balance = await web3.eth.getBalance(account);
+                const ethBalance = web3.utils.fromWei(balance, 'ether');
+                document.getElementById('balance-amount').textContent = `${ethBalance} ETH`;
+            } catch (error) {
+                console.error("Failed to fetch balance:", error);
+                alert("Failed to fetch balance. Please try again.");
+            }
         }
-
+    
         function disconnectWallet() {
             document.getElementById('wallet-address').style.display = 'none';
             document.getElementById('connect-btn').style.display = 'block';
             document.getElementById('balance-amount').textContent = '$0.00';
         }
-
+    
         // Placeholder functions for actions
         function buyCrypto() { alert("Buy interface coming soon"); }
         function sellCrypto() { alert("Sell interface coming soon"); }
