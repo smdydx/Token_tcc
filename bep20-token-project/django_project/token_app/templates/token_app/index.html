@@ -374,56 +374,53 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
 
     <script>
         let web3;
+        let provider;
     
-        // Sidebar Toggle
-        document.getElementById('sidebar-toggle').addEventListener('click', function () {
-            const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('active');
-        });
-    
-        // Close sidebar when clicking outside on mobile
-        document.addEventListener('click', function (event) {
-            const sidebar = document.querySelector('.sidebar');
-            const sidebarToggle = document.getElementById('sidebar-toggle');
-    
-            if (window.innerWidth <= 768 &&
-                !sidebar.contains(event.target) &&
-                !sidebarToggle.contains(event.target)) {
-                sidebar.classList.remove('active');
-            }
-        });
-    
-        // Wallet Functions
         async function connectWallet() {
             if (typeof window.ethereum !== 'undefined') {
+                // Desktop browser with MetaMask
                 try {
-                    // Request account access
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
                     web3 = new Web3(window.ethereum);
     
-                    // Get the connected account
                     const accounts = await web3.eth.getAccounts();
                     const account = accounts[0];
     
-                    // Update the UI with the connected account
                     updateWalletUI(account);
-    
-                    // Fetch and display the balance
                     getBalance(account);
                 } catch (error) {
                     console.error("User denied account access or an error occurred:", error);
                     alert("Failed to connect wallet. Please try again.");
                 }
-            } else {
-                // Check if the user is on a mobile device
-                if (isMobileDevice()) {
-                    alert("MetaMask is not detected. Please open this website in the MetaMask mobile browser.");
-                } else {
-                    alert("MetaMask is not installed. Please install MetaMask and try again.");
+            } else if (isMobileDevice()) {
+                // Mobile browser without MetaMask
+                try {
+                    provider = new WalletConnectProvider.default({
+                        rpc: {
+                            56: "https://bsc-dataseed.binance.org/" // Binance Smart Chain RPC URL
+                        }
+                    });
+    
+                    // Enable session (triggers QR Code modal)
+                    await provider.enable();
+    
+                    web3 = new Web3(provider);
+    
+                    const accounts = await web3.eth.getAccounts();
+                    const account = accounts[0];
+    
+                    updateWalletUI(account);
+                    getBalance(account);
+                } catch (error) {
+                    console.error("WalletConnect error:", error);
+                    alert("Failed to connect wallet. Please try again.");
                 }
+            } else {
+                alert("MetaMask is not installed. Please install MetaMask and try again.");
             }
         }
     
@@ -445,20 +442,17 @@
         }
     
         function disconnectWallet() {
+            if (provider) {
+                provider.disconnect();
+            }
             document.getElementById('wallet-address').style.display = 'none';
             document.getElementById('connect-btn').style.display = 'block';
             document.getElementById('balance-amount').textContent = '$0.00';
         }
     
-        // Helper function to detect mobile devices
         function isMobileDevice() {
             return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         }
-    
-        // Placeholder functions for actions
-        function buyCrypto() { alert("Buy interface coming soon"); }
-        function sellCrypto() { alert("Sell interface coming soon"); }
-        function swapTokens() { alert("Swap interface coming soon"); }
     </script>
 </body>
 </html>
