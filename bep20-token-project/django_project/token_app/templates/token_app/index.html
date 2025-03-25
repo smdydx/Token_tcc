@@ -3,19 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Wallet Pro</title>
+    <title>CryptoSphere Pro</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <!-- Animate CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
         :root {
-            --primary: #F6851B;
-            --background: #121212;
-            --surface: #1E1E1E;
-            --secondary-text: #888;
+            --primary: #6366F1;
+            --primary-hover: #4F46E5;
+            --background: #0F172A;
+            --surface: #1E293B;
+            --secondary-text: #94A3B8;
+            --success: #10B981;
+            --warning: #F59E0B;
         }
 
         * {
@@ -29,51 +34,95 @@
             background: var(--background);
             color: white;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        /* Sidebar */
+        /* Animated Gradient Background */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(-45deg, #0F172A, #1E293B, #0F172A);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            z-index: -1;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Modern Sidebar */
         .sidebar {
-            width: 240px;
-            background: var(--surface);
-            padding: 20px;
+            width: 280px;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
             position: fixed;
             height: 100vh;
-            border-right: 1px solid rgba(255,255,255,0.1);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-header {
+            margin-bottom: 2.5rem;
         }
 
         .sidebar-nav {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 0.75rem;
         }
 
         .sidebar-link {
             color: var(--secondary-text);
-            padding: 12px 16px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
         }
 
         .sidebar-link:hover {
             background: rgba(255,255,255,0.05);
             color: white;
+            transform: translateX(8px);
         }
 
         .sidebar-link.active {
-            background: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
             color: white;
+        }
+
+        .sidebar-link.active::before {
+            transform: scaleY(1);
         }
 
         /* Main Content */
         .main-content {
-            margin-left: 240px;
-            padding: 32px;
+            margin-left: 280px;
+            padding: 2.5rem;
             transition: margin 0.3s;
         }
 
@@ -82,155 +131,149 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .wallet-info {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.5s ease;
         }
 
         .network-indicator {
             background: rgba(255,255,255,0.1);
-            padding: 8px 12px;
+            padding: 0.5rem 1rem;
             border-radius: 8px;
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        /* Toggle Button */
-        #sidebar-toggle {
-            background: none;
-            border: none;
-            color: white;
-            padding: 8px;
-            display: none;
+        .network-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
         }
 
         /* Balance Card */
         .balance-card {
             background: var(--surface);
-            border-radius: 16px;
-            padding: 32px;
-            margin-bottom: 32px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            animation: cardEnter 0.6s ease;
         }
 
-        .balance-amount {
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin-bottom: 8px;
+        .balance-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            animation: glow 4s linear infinite;
         }
 
-        .balance-change {
-            color: var(--primary);
-            font-size: 1rem;
+        @keyframes glow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* Quick Actions */
         .quick-actions {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 16px;
-            margin-bottom: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
         }
 
         .action-card {
             background: var(--surface);
-            padding: 20px;
-            border-radius: 12px;
+            padding: 1.5rem;
+            border-radius: 16px;
             text-align: center;
-            transition: transform 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
         }
 
         .action-card:hover {
-            transform: translateY(-2px);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             border-color: var(--primary);
         }
 
-        .action-icon {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 12px;
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(99, 102, 241, 0.05), transparent);
+            pointer-events: none;
         }
 
         /* Transactions */
         .transactions-section {
             background: var(--surface);
-            border-radius: 16px;
-            padding: 24px;
+            border-radius: 20px;
+            padding: 2rem;
+            animation: fadeIn 0.8s ease;
         }
 
         .transaction-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px 0;
+            padding: 1.25rem 0;
             border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s ease;
         }
 
-        .transaction-status {
-            width: 8px;
-            height: 8px;
+        .transaction-item:hover {
+            transform: translateX(10px);
+        }
+
+        /* Loader */
+        .loader {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary);
             border-radius: 50%;
-            background: var(--primary);
+            animation: spin 1s linear infinite;
         }
 
-        /* Token Info */
-        .token-info-section {
-            margin-top: 32px;
-            background: var(--surface);
-            border-radius: 16px;
-            padding: 24px;
+        /* Animations */
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        .token-info-text {
-            color: var(--secondary-text);
-            line-height: 1.6;
-            max-width: 800px;
+        @keyframes cardEnter {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        /* Connect Button */
-        .connect-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: opacity 0.2s ease;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .connect-btn:hover {
-            opacity: 0.9;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .wallet-address {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .wallet-address span {
-            font-size: 0.8rem;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 6px 12px;
-            border-radius: 4px;
-        }
-
-        .wallet-address i {
-            cursor: pointer;
-            color: #ff9800;
-            font-size: 1rem;
-        }
-
+        /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
-                width: 280px;
+                width: 100%;
+                max-width: 300px;
             }
             
             .sidebar.active {
@@ -239,53 +282,57 @@
 
             .main-content {
                 margin-left: 0;
-                padding: 24px;
+                padding: 1.5rem;
             }
 
-            #sidebar-toggle {
-                display: block;
+            .balance-card {
+                padding: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
+    <div class="gradient-bg"></div>
+    
     <nav class="sidebar">
         <div class="d-flex flex-column h-100">
-            <div class="mb-8">
-                <h3 class="text-white mb-5">EraWallet</h3>
-                <nav class="sidebar-nav">
-                    <a href="#" class="sidebar-link active">
-                        <i class="fas fa-wallet"></i>
-                        Wallet
-                    </a>
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-exchange-alt"></i>
-                        Swap
-                    </a>
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-chart-line"></i>
-                        Markets
-                    </a>
-                    <a href="#" class="sidebar-link">
-                        <i class="fas fa-cog"></i>
-                        Settings
-                    </a>
-                </nav>
+            <div class="sidebar-header">
+                <h2 class="text-white mb-0">CryptoSphere</h2>
+                <small class="text-secondary">Secure Web3 Wallet</small>
             </div>
+            <nav class="sidebar-nav mt-4">
+                <a href="#" class="sidebar-link active">
+                    <i class="fas fa-wallet"></i>
+                    Portfolio
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-exchange-alt"></i>
+                    Exchange
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-chart-network"></i>
+                    NFT Marketplace
+                </a>
+                <a href="#" class="sidebar-link">
+                    <i class="fas fa-cog"></i>
+                    Settings
+                </a>
+            </nav>
         </div>
     </nav>
 
     <main class="main-content">
-        <!-- Wallet Header -->
         <header class="wallet-header">
             <div class="wallet-info">
                 <button id="sidebar-toggle" class="d-lg-none mr-3">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 class="text-white">Digital Wallet</h1>
-                <div class="network-indicator">Ethereum Mainnet</div>
+                <div class="network-indicator">
+                    <span class="network-dot"></span>
+                    <span>Ethereum Mainnet</span>
+                </div>
             </div>
-            <div>
+            <div class="wallet-controls">
                 <button class="connect-btn" id="connect-btn" onclick="connectWallet()">
                     <i class="fas fa-plug"></i>
                     Connect Wallet
@@ -297,142 +344,224 @@
             </div>
         </header>
 
-        <!-- Balance Card -->
         <section class="balance-card">
-            <div class="text-secondary">Total Balance</div>
-            <div class="balance-amount" id="balance-amount">$0.00</div>
-            <div class="balance-change">
-                <i class="fas fa-arrow-up"></i>
-                +$0.00 (0.00%)
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="text-secondary mb-2">Total Balance</div>
+                    <div class="balance-amount" id="balance-amount">
+                        <div class="loader" id="balance-loader" style="display: none;"></div>
+                        <span id="balance-text">0 ETH</span>
+                    </div>
+                </div>
+                <div class="balance-change text-success">
+                    <i class="fas fa-arrow-trend-up"></i>
+                    +5.2% (24h)
+                </div>
             </div>
         </section>
 
-        <!-- Quick Actions -->
         <div class="quick-actions">
-            <div class="action-card" onclick="buyCrypto()">
+            <div class="action-card" onclick="handleAction('buy')">
                 <div class="action-icon"><i class="fas fa-cart-plus"></i></div>
                 <div>Buy</div>
             </div>
-            <div class="action-card" onclick="sellCrypto()">
+            <div class="action-card" onclick="handleAction('sell')">
                 <div class="action-icon"><i class="fas fa-coins"></i></div>
                 <div>Sell</div>
             </div>
-            <div class="action-card" onclick="swapTokens()">
-                <div class="action-icon"><i class="fas fa-exchange-alt"></i></div>
+            <div class="action-card" onclick="handleAction('swap')">
+                <div class="action-icon"><i class="fas fa-arrows-rotate"></i></div>
                 <div>Swap</div>
             </div>
-            <a href="{% url 'transfer' %}" class="action-card">
+            <div class="action-card" onclick="handleAction('send')">
                 <div class="action-icon"><i class="fas fa-paper-plane"></i></div>
                 <div>Send</div>
-            </a>
+            </div>
         </div>
 
-        <!-- Transactions -->
         <section class="transactions-section">
-            <h4 class="text-white mb-4">Recent Transactions</h4>
-            <div class="transaction-item">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="transaction-status"></div>
-                    <div>
-                        <div>Sent 0.1 ETH</div>
-                        <div class="text-secondary">To: 0x123...789</div>
-                    </div>
-                </div>
-                <div class="text-secondary">Pending</div>
+            <h4 class="text-white mb-4">Transaction History</h4>
+            <div id="transactions-list">
+                <!-- Dynamic transactions will be loaded here -->
             </div>
-            <div class="transaction-item">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="transaction-status"></div>
-                    <div>
-                        <div>Received 1.5 ETH</div>
-                        <div class="text-secondary">From: 0xabc...456</div>
-                    </div>
-                </div>
-                <div class="text-success">Completed</div>
-            </div>
-        </section>
-
-        <!-- Token Information -->
-        <section class="token-info-section">
-            <h4 class="text-white mb-4">About Crypto Tokens</h4>
-            <p class="token-info-text">
-                Cryptographic tokens are digital assets built on blockchain technology, 
-                representing ownership or access rights. They enable decentralized 
-                applications through smart contracts, allowing for programmable money 
-                and decentralized finance (DeFi) solutions. Tokens can represent various 
-                assets including currencies, securities, or utility access.
-                
-                Modern tokens adhere to standards like ERC-20 (fungible tokens) and 
-                ERC-721 (non-fungible tokens), ensuring interoperability across platforms. 
-                Always verify contract addresses and audit reports before transactions.
-            </p>
         </section>
     </main>
 
-    <!-- Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.7.8/dist/umd/index.min.js"></script>
 
     <script>
         let web3;
         let provider;
+        let currentAccount = null;
 
-        async function connectWallet() {
-            // Modern dapp browsers with Ethereum support
-            if (window.ethereum) {
-                try {
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    web3 = new Web3(window.ethereum);
-                    const accounts = await web3.eth.getAccounts();
-                    updateWalletUI(accounts[0]);
-                    getBalance(accounts[0]);
-                } catch (error) {
-                    console.error("User denied account access:", error);
-                    alert("Please connect your wallet to continue.");
-                }
-            }
-            // Mobile browsers without MetaMask but with WalletConnect
-            else if (isMobileDevice()) {
-                try {
-                    provider = new WalletConnectProvider.default({
-                        rpc: {
-                            1: "https://cloudflare-eth.com" // Ethereum mainnet RPC
-                        },
-                        chainId: 1, // Ethereum mainnet
-                        qrcode: true,
-                    });
+        // Initialize
+        $(document).ready(() => {
+            // Sidebar toggle
+            $('#sidebar-toggle').click(() => {
+                $('.sidebar').toggleClass('active');
+            });
 
-                    await provider.enable();
-                    web3 = new Web3(provider);
-                    
-                    const accounts = await web3.eth.getAccounts();
-                    updateWalletUI(accounts[0]);
-                    getBalance(accounts[0]);
+            // Check if wallet is already connected
+            checkConnectedWallet();
+        });
 
-                    provider.on("disconnect", () => {
-                        disconnectWallet();
-                    });
-                } catch (error) {
-                    console.error("WalletConnect error:", error);
-                    alert("Failed to connect via WalletConnect");
-                }
-            } else {
-                alert("Please install MetaMask or use a mobile wallet with WalletConnect support.");
+        async function checkConnectedWallet() {
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                currentAccount = window.ethereum.selectedAddress;
+                updateWalletUI(currentAccount);
+                loadWalletData(currentAccount);
             }
         }
 
-        async function getBalance(account) {
+        async function connectWallet() {
             try {
-                const balance = await web3.eth.getBalance(account);
-                const ethBalance = web3.utils.fromWei(balance, 'ether');
-                document.getElementById('balance-amount').textContent = `${ethBalance} ETH`;
+                $('#connect-btn').prop('disabled', true);
+                
+                if (window.ethereum) {
+                    // Desktop/Mobile with MetaMask
+                    await handleMetaMask();
+                } else if (isMobileDevice()) {
+                    // Mobile with WalletConnect
+                    await handleWalletConnect();
+                } else {
+                    throw new Error('No Ethereum provider detected');
+                }
             } catch (error) {
-                console.error("Balance fetch error:", error);
-                alert("Error fetching balance");
+                showError(`Connection Error: ${error.message}`);
+            } finally {
+                $('#connect-btn').prop('disabled', false);
             }
+        }
+
+        async function handleMetaMask() {
+            try {
+                const accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+                currentAccount = accounts[0];
+                web3 = new Web3(window.ethereum);
+                initEventListeners();
+                loadWalletData(currentAccount);
+                updateWalletUI(currentAccount);
+            } catch (error) {
+                throw new Error('User rejected request');
+            }
+        }
+
+        async function handleWalletConnect() {
+            try {
+                provider = new WalletConnectProvider.default({
+                    rpc: {
+                        1: "https://cloudflare-eth.com",
+                        137: "https://polygon-rpc.com"
+                    },
+                    chainId: 1,
+                    qrcodeModalOptions: {
+                        mobileLinks: [
+                            'metamask',
+                            'trust',
+                            'rainbow',
+                            'argent'
+                        ]
+                    }
+                });
+
+                await provider.enable();
+                web3 = new Web3(provider);
+                const accounts = await web3.eth.getAccounts();
+                currentAccount = accounts[0];
+                initEventListeners();
+                loadWalletData(currentAccount);
+                updateWalletUI(currentAccount);
+            } catch (error) {
+                throw new Error('WalletConnect connection failed');
+            }
+        }
+
+        function initEventListeners() {
+            if (window.ethereum) {
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    if (accounts.length === 0) {
+                        disconnectWallet();
+                    } else {
+                        currentAccount = accounts[0];
+                        updateWalletUI(currentAccount);
+                        loadWalletData(currentAccount);
+                    }
+                });
+
+                window.ethereum.on('chainChanged', (chainId) => {
+                    updateNetwork(parseInt(chainId));
+                });
+            }
+        }
+
+        async function loadWalletData(address) {
+            try {
+                $('#balance-loader').show();
+                $('#balance-text').hide();
+                
+                const balance = await web3.eth.getBalance(address);
+                const ethBalance = web3.utils.fromWei(balance, 'ether');
+                
+                $('#balance-text').text(`${parseFloat(ethBalance).toFixed(4)} ETH`);
+                loadTransactionHistory(address);
+            } catch (error) {
+                showError('Failed to load wallet data');
+            } finally {
+                $('#balance-loader').hide();
+                $('#balance-text').show();
+            }
+        }
+
+        async function loadTransactionHistory(address) {
+            // Implement actual transaction fetching here
+            const mockTransactions = [
+                {
+                    type: 'sent',
+                    amount: '0.1 ETH',
+                    to: '0x123...789',
+                    status: 'pending',
+                    timestamp: new Date().toISOString()
+                },
+                {
+                    type: 'received',
+                    amount: '1.5 ETH',
+                    from: '0xabc...456',
+                    status: 'completed',
+                    timestamp: new Date().toISOString()
+                }
+            ];
+
+            $('#transactions-list').html(
+                mockTransactions.map(tx => `
+                    <div class="transaction-item">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="transaction-status ${tx.status}"></div>
+                            <div>
+                                <div>${tx.type === 'sent' ? 'Sent' : 'Received'} ${tx.amount}</div>
+                                <small class="text-secondary">
+                                    ${tx.type === 'sent' ? 'To' : 'From'}: ${tx.to || tx.from}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="text-${tx.status === 'completed' ? 'success' : 'warning'}">
+                            ${tx.status}
+                        </div>
+                    </div>
+                `).join('')
+            );
+        }
+
+        function updateWalletUI(address) {
+            $('#connect-btn').hide();
+            $('#wallet-address').show();
+            $('#wallet-address-text').text(
+                `${address.slice(0, 6)}...${address.slice(-4)}`
+            );
         }
 
         function disconnectWallet() {
@@ -441,13 +570,25 @@
                 provider = null;
             }
             web3 = null;
-            document.getElementById('wallet-address').style.display = 'none';
-            document.getElementById('connect-btn').style.display = 'block';
-            document.getElementById('balance-amount').textContent = '0 ETH';
+            currentAccount = null;
+            $('#wallet-address').hide();
+            $('#connect-btn').show();
+            $('#balance-text').text('0 ETH');
+            $('#transactions-list').empty();
+        }
+
+        function handleAction(type) {
+            // Implement action handlers
+            console.log(`Handling ${type} action`);
         }
 
         function isMobileDevice() {
             return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        function showError(message) {
+            // Implement error toast
+            console.error(message);
         }
     </script>
 </body>
